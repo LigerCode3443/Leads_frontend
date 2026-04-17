@@ -1,10 +1,8 @@
-import axios, { AxiosError } from 'axios';
-import { Comment, GetLeadsParams, Lead, LeadStatus, PaginatedLeads } from '@/lib/types';
+import { Comment, GetLeadsParams, Lead, PaginatedLeads } from '@/lib/types';
+import axios from 'axios';
 
-const API_BASE = 
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || 
-  'http://localhost:5001'; 
-
+const API_BASE = process.env.NEXT_PUBLIC_BASE_URL
+console.log(process.env.NEXT_PUBLIC_BASE_URL)
 const api = axios.create({
   baseURL: API_BASE,
   headers: {
@@ -26,9 +24,9 @@ function handleApiError(err: unknown): never {
       status: err.response?.status || 500,
       data: err.response?.data,
     };
-    throw errorResponse; // Викидаємо об'єкт помилки
+    throw errorResponse;
   }
-  
+
   throw { message: 'An unexpected error occurred', status: 500 } as ApiErrorResponse;
 }
 
@@ -91,7 +89,7 @@ export async function getComments(leadId: string): Promise<Comment[]> {
 
 export async function addComment(leadId: string, dto: { text: string }): Promise<Comment> {
   try {
-    const res = await api.post<Comment>(`/comments/creat/${encodeURIComponent(leadId)}`, dto);
+    const res = await api.post<Comment>(`/comments/create/${encodeURIComponent(leadId)}`, dto);
     return res.data;
   } catch (err) {
     handleApiError(err);

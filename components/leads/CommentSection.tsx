@@ -7,18 +7,17 @@ import { ApiError } from 'next/dist/server/api-utils';
 
 export default function CommentSection({
   leadId,
-  initialComments,
+  comments,
   composerOnly,
   listOnly,
-  onNewComment,
+  onNewComments,
 }: {
   leadId: string;
-  initialComments: Comment[];
+  comments: Comment[];
   composerOnly?: boolean;
   listOnly?: boolean;
-  onNewComment?: (comment: Comment) => void;
+  onNewComments?: (comment: Comment) => void;
 }) {
-  const [comments, setComments] = useState<Comment[]>(initialComments);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,8 +30,8 @@ export default function CommentSection({
     setError(null);
     try {
       const newComment = await addComment(leadId, { text: text.trim() });
-      setComments((prev) => [newComment, ...prev]);
-      onNewComment?.(newComment);
+
+      onNewComments?.(newComment);
       setText('');
     } catch (err) {
       if (err instanceof ApiError) setError(err.message);
@@ -75,11 +74,15 @@ export default function CommentSection({
 
       {!composerOnly && (
         <div className="space-y-4">
-          {comments.length === 0 && <div className="py-6 text-sm text-gray-500">No comments yet.</div>}
+          {comments.length === 0 && (
+            <div className="py-6 text-sm text-gray-500">No comments yet.</div>
+          )}
           {comments.map((c) => (
             <div key={c.id} className="bg-gray-50 p-4 rounded border">
               <p className="text-gray-800">{c.text}</p>
-              <span className="text-xs text-gray-400">{new Date(c.createdAt).toLocaleString()}</span>
+              <span className="text-xs text-gray-400">
+                {new Date(c.createdAt).toLocaleString()}
+              </span>
             </div>
           ))}
         </div>

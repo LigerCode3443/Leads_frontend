@@ -1,30 +1,63 @@
-import { notFound } from 'next/navigation';
+'use client'; // 1. Додаємо директиву клієнта
+
+import { useEffect, useState } from 'react';
+import { notFound, useParams } from 'next/navigation';
 import LeadDetailsClient from '@/components/leads/LeadDetailsClient';
 import LeadComments from '@/components/leads/LeadComments';
 import { getComments, getLead } from '@/lib/api';
-import { ApiError } from 'next/dist/server/api-utils';
+import { Lead } from '../../../lib/types';
 
-export default async function LeadDetailsPage({ params }: { params: { id: string } }) {
-  let lead: Awaited<ReturnType<typeof getLead>>;
-  let comments: Awaited<ReturnType<typeof getComments>>;
+export default function LeadDetailsPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-  try {
-    lead = await getLead(params.id);
-  } catch (err) {
-    if (err instanceof ApiError && err.statusCode === 404) return notFound();
-    throw err;
-  }
+  const [lead, setLead] = useState<Lead>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  try {
-    comments = await getComments(params.id);
-  } catch {
-    comments = [];
-  }
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+
+        const [leadData, commentsData] = await Promise.all([
+          getLead(id),
+          getComments(id).catch(() => []),
+        ]);
+
+        if (!leadData) {
+          setError(true);
+        } else {
+          setLead(leadData);
+          setComments(commentsData);
+        }
+      } catch (err: Error) {
+        console.error(err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (id) fetchData();
+  }, [id]);
+
+  const onNewComments = async (newComment) => {
+    try {
+      setComments((prev) => [newComment, ...prev]);
+      console.log(comments);
+    } catch (err: Error) {
+      console.err(err);
+    }
+  };
+  if (loading) return <div className="p-6 text-center">Loading...</div>;
+  if (error || !lead) return notFound();
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <LeadDetailsClient initialLead={lead} />
-      <LeadComments leadId={lead.id} initialComments={comments} />
+      <LeadComments leadId={lead.id} comments={comments} onNewComments={onNewComments} />
     </div>
   );
 }

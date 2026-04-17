@@ -19,9 +19,6 @@ export default function LeadTable({ leads }: { leads: Lead[] }) {
     return <div className="py-10 text-center text-gray-500">No leads found.</div>;
 
   const onDelete = async (id: string) => {
-    const ok = window.confirm('Delete this lead? This action cannot be undone.');
-    if (!ok) return;
-
     setError(null);
     setDeletingId(id);
     try {
@@ -73,16 +70,15 @@ export default function LeadTable({ leads }: { leads: Lead[] }) {
         </div>
       )}
       {leads.map((lead) => (
-        <div className="p-3 border border-solid border-black rounded-lg">
+        <div className="p-3 border border-solid border-black rounded-lg" key={lead.id}>
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-col">
               <p className="text-xl">{lead.name}</p>
               <p className="text-sm text-gray-600">{lead.email}</p>
             </div>
-            <div>
-              <button className="rounded-lg px-[10px] py-[5px] border border-solid border-blue-800">Detail</button>
+            <div className="flex flex-row gap-2">
               <select
-                className="border p-1 rounded"
+                className="border p-1 rounded-lg"
                 defaultValue={lead.status}
                 onChange={(e) => onToggleStatus(lead.id, e.target.value)}
               >
@@ -92,71 +88,26 @@ export default function LeadTable({ leads }: { leads: Lead[] }) {
                   </option>
                 ))}
               </select>
+
+              <button
+                onClick={() => {
+                  router.push(`/leads/${lead.id}`);
+                }}
+                className="rounded-lg px-3 py-0.5 border border-solid border-black"
+              >
+                Detail
+              </button>
+
+              <button
+                onClick={() => {
+                  onDelete(lead.id);
+                }}
+                className="rounded-lg px-3 py-0.5 border border-solid border-black bg-red-500"
+              >
+                Delete
+              </button>
             </div>
           </div>
-          {/* <Box
-              sx={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                gap: 1.5,
-                alignItems: { sm: 'center' },
-              }}
-            >
-              <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography component="div" noWrap sx={{ fontWeight: 700 }}>
-                  {lead.name}
-                </Typography>
-                <Typography component="div" variant="body2" color="text.secondary" noWrap>
-                  {lead.email || '—'} · {lead.company || '—'}
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <Link
-                  href={`/leads/${lead.id}`}
-                  className="inline-flex"
-                  onClick={(e) => e.stopPropagation()}
-                  onMouseDown={(e) => e.stopPropagation()}
-                >
-                  <Button size="small" variant="text">
-                    Details
-                  </Button>
-                </Link>
-
-                <select
-                  className="border p-2 rounded"
-                  defaultValue={lead.status}
-                  onChange={(e) => onToggleStatus(lead.id, lead.status)}
-                >
-                  {Object.values(LeadStatus).map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-                <Button
-                  size="small"
-                  color="error"
-                  variant="text"
-                  disabled={deletingId === lead.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(lead.id);
-                  }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                >
-                  {deletingId === lead.id ? 'Deleting…' : 'Delete'}
-                </Button>
-              </Box>
-            </Box> */}
         </div>
       ))}
     </div>

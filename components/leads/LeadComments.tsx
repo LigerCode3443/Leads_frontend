@@ -6,10 +6,12 @@ import { Comment } from '@/lib/types';
 
 export default function LeadComments({
   leadId,
-  initialComments,
+  comments,
+  onNewComments,
 }: {
   leadId: string;
-  initialComments: Comment[];
+  comments: Comment[];
+  onNewComments: (com: Coment) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -35,14 +37,23 @@ export default function LeadComments({
         }`}
       >
         <div className={open ? 'p-4' : 'p-0'}>
-          <CommentSection leadId={leadId} initialComments={initialComments} composerOnly />
+          <CommentSection
+            leadId={leadId}
+            comments={comments}
+            composerOnly
+            onNewComments={onNewComments}
+          />
         </div>
       </div>
 
       <div className="mt-4">
-        <CommentSection leadId={leadId} initialComments={initialComments} listOnly />
+        <CommentSection
+          leadId={leadId}
+          comments={comments}
+          listOnly
+          onNewComments={onNewComments}
+        />
       </div>
     </div>
   );
 }
-

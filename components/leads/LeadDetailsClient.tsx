@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { deleteLead, updateLead } from '@/lib/api';
-import { Lead, LeadStatus } from '@/lib/types';
+import { deleteLead } from '@/lib/api';
+import { Lead } from '@/lib/types';
 import LeadForm from '@/components/leads/LeadForm';
 import { ApiError } from 'next/dist/server/api-utils';
 
@@ -13,24 +13,7 @@ export default function LeadDetailsClient({ initialLead }: { initialLead: Lead }
   const [lead, setLead] = useState<Lead>(initialLead);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [statusChanging, setStatusChanging] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // const toggleStatus = async () => {
-  //   setError(null);
-  //   setStatusChanging(true);
-  //   try {
-  //     // const updated = await updateLead(lead.id, { status: nextStatus });
-  //     setLead(updated);
-  //     // keep list page consistent if user navigates back
-  //     router.refresh();
-  //   } catch (err) {
-  //     if (err instanceof ApiError) setError(err.message);
-  //     else setError('Failed to change status.');
-  //   } finally {
-  //     setStatusChanging(false);
-  //   }
-  // };
 
   const onDelete = async () => {
     const ok = window.confirm('Delete this lead? This action cannot be undone.');
@@ -52,6 +35,9 @@ export default function LeadDetailsClient({ initialLead }: { initialLead: Lead }
 
   return (
     <div className="bg-white shadow-sm rounded-lg border p-6">
+      <Link href="/leads" className="text-lg text-gray-600 hover:text-blue-700">
+        Back to list
+      </Link>
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">{lead.name}</h2>
@@ -81,26 +67,10 @@ export default function LeadDetailsClient({ initialLead }: { initialLead: Lead }
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/leads" className="text-sm text-gray-600 hover:text-gray-900">
-            Back to list
-          </Link>
-          {/* <button
-            type="button"
-            onClick={toggleStatus}
-            disabled={statusChanging}
-            className="text-sm px-3 py-2 rounded border bg-white hover:bg-gray-50 disabled:opacity-60"
-            title="Quick status toggle"
-          >
-            {statusChanging
-              ? 'Updating…'
-              : lead.status === LeadStatus.ACTIVE
-                ? 'Mark inactive'
-                : 'Mark active'}
-          </button> */}
           <button
             type="button"
             onClick={() => setEditing((v) => !v)}
-            className="text-sm px-3 py-2 rounded border bg-white hover:bg-gray-50"
+            className="text-sm px-3 py-1 rounded border bg-white hover:bg-gray-50"
           >
             {editing ? 'Close' : 'Edit'}
           </button>
@@ -137,4 +107,3 @@ export default function LeadDetailsClient({ initialLead }: { initialLead: Lead }
     </div>
   );
 }
-
