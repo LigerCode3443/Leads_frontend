@@ -1,4 +1,3 @@
-// src/components/leads/Filters.tsx
 'use client';
 
 import { LeadStatus } from '@/lib/types';

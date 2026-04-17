@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Comment } from '@/lib/types';
+import { LeadComment } from '@/lib/types';
 import { addComment } from '@/lib/api';
 import { ApiError } from 'next/dist/server/api-utils';
 
@@ -13,10 +13,10 @@ export default function CommentSection({
   onNewComments,
 }: {
   leadId: string;
-  comments: Comment[];
+  comments: LeadComment[];
   composerOnly?: boolean;
   listOnly?: boolean;
-  onNewComments?: (comment: Comment) => void;
+  onNewComments?: (comment: LeadComment) => void;
 }) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);

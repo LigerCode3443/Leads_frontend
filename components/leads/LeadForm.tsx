@@ -23,6 +23,8 @@ const leadSchema = z.object({
 
 type LeadFormData = z.infer<typeof leadSchema>;
 
+type LeadFormInput = z.input<typeof leadSchema>;
+
 type Props = {
   mode: 'create' | 'edit';
   initial?: Lead;
@@ -50,7 +52,7 @@ export default function LeadForm({ mode, initial, onSaved, onCancel }: Props) {
     },
   });
 
-  const onSubmit: SubmitHandler<LeadFormData> = async (data: LeadFormData) => {
+  const onSubmit: SubmitHandler<LeadFormInput> = async (data: LeadFormData) => {
     setError(null);
     try {
       const lead = mode === 'create' ? await createLead(data) : await updateLead(initial!.id, data);

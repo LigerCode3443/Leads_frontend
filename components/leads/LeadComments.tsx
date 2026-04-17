@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import CommentSection from '@/components/leads/CommentSection';
-import { Comment } from '@/lib/types';
+import { LeadComment } from '@/lib/types';
 
 export default function LeadComments({
   leadId,
@@ -10,8 +10,8 @@ export default function LeadComments({
   onNewComments,
 }: {
   leadId: string;
-  comments: Comment[];
-  onNewComments: (com: Coment) => void;
+  comments: LeadComment[];
+  onNewComments: (com: LeadComment) => void;
 }) {
   const [open, setOpen] = useState(false);
 

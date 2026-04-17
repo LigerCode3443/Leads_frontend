@@ -5,14 +5,14 @@ import { notFound, useParams } from 'next/navigation';
 import LeadDetailsClient from '@/components/leads/LeadDetailsClient';
 import LeadComments from '@/components/leads/LeadComments';
 import { getComments, getLead } from '@/lib/api';
-import { Lead } from '../../../lib/types';
+import { Lead, LeadComment } from '../../../lib/types';
 
 export default function LeadDetailsPage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [lead, setLead] = useState<Lead>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [lead, setLead] = useState<Lead | null>(null);
+  const [comments, setComments] = useState<LeadComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -32,7 +32,7 @@ export default function LeadDetailsPage() {
           setLead(leadData);
           setComments(commentsData);
         }
-      } catch (err: Error) {
+      } catch (err: unknown) {
         console.error(err);
         setError(true);
       } finally {
@@ -43,12 +43,12 @@ export default function LeadDetailsPage() {
     if (id) fetchData();
   }, [id]);
 
-  const onNewComments = async (newComment) => {
+  const onNewComments = async (newComment: LeadComment) => {
     try {
       setComments((prev) => [newComment, ...prev]);
       console.log(comments);
-    } catch (err: Error) {
-      console.err(err);
+    } catch (err: unknown) {
+      console.log(err);
     }
   };
   if (loading) return <div className="p-6 text-center">Loading...</div>;

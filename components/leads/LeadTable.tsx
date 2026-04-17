@@ -1,26 +1,20 @@
 'use client';
 
-import { deleteLead, getComments, updateLead } from '@/lib/api';
-import { Comment, Lead, LeadStatus } from '@/lib/types';
+import { deleteLead, updateLead } from '@/lib/api';
+import { Lead, LeadStatus } from '@/lib/types';
 import { ApiError } from 'next/dist/server/api-utils';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function LeadTable({ leads }: { leads: Lead[] }) {
   const router = useRouter();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [commentsLoadingForId, setCommentsLoadingForId] = useState<string | null>(null);
-  const [commentsError, setCommentsError] = useState<string | null>(null);
-  const [commentsCache, setCommentsCache] = useState<Record<string, Comment[]>>({});
 
   if (leads.length === 0)
     return <div className="py-10 text-center text-gray-500">No leads found.</div>;
 
   const onDelete = async (id: string) => {
     setError(null);
-    setDeletingId(id);
     try {
       await deleteLead(id);
       router.refresh();
@@ -28,7 +22,6 @@ export default function LeadTable({ leads }: { leads: Lead[] }) {
       if (err instanceof ApiError) setError(err.message);
       else setError('Failed to delete the lead.');
     } finally {
-      setDeletingId(null);
     }
   };
 
@@ -43,22 +36,6 @@ export default function LeadTable({ leads }: { leads: Lead[] }) {
       else setError('Failed to update status.');
     } finally {
       setStatusChangingId(null);
-    }
-  };
-
-  const ensureComments = async (leadId: string) => {
-    setCommentsError(null);
-    if (commentsCache[leadId]) return;
-
-    setCommentsLoadingForId(leadId);
-    try {
-      const list = await getComments(leadId);
-      setCommentsCache((prev) => ({ ...prev, [leadId]: list }));
-    } catch (err) {
-      if (err instanceof ApiError) setCommentsError(err.message);
-      else setCommentsError('Failed to load comments.');
-    } finally {
-      setCommentsLoadingForId(null);
     }
   };
 
